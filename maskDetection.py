@@ -22,13 +22,7 @@ id2class = {0: 'Mask', 1: 'NoMask'}
 
 def inference(model, image, target_shape, conf_thresh=0.5, iou_thresh=0.4 ):
 
-    # try:
-    #     image = cv2.imread(image)
-    #     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    # except:
-    #     print("imread or cvtColor error")
-    #     return {'msg': 'Image read error'}
-
+    # convert RGB to BGR
     image = np.array(image)[:, :, ::-1].copy()
 
     output_info = []
@@ -68,7 +62,7 @@ def inference(model, image, target_shape, conf_thresh=0.5, iou_thresh=0.4 ):
         if class_id == 0:
             color = (0, 255, 0)
         else:
-            color = (255, 0, 0)
+            color = (0, 0, 255)
         cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
         cv2.putText(image, "%s: %.2f" % (id2class[class_id], conf), (xmin + 2, ymin - 2),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, color)
