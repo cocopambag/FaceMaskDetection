@@ -10,28 +10,29 @@ from queue import Queue,Empty
 from maskDetection import inference
 from load_model.pytorch_loader import load_pytorch_model
 
-app = Flask(__name__, template_folder="/templates/")
+app = Flask(__name__, template_folder="./templates/")
 
 requests_queue = Queue()
-BATCH_SIZE = 0
+BATCH_SIZE = 1
 CHECK_INTERVAL = 0.1
 
 b = time.time()
 model = load_pytorch_model('models/model360.pth') 
 print("model load time : ", time.time()-b)
-# def handle_requests_by_batch():
-#     while True:
-#         requests_batch = []
-#         while not (len(requests_batch) >= BATCH_SIZE):
-#             try:
-#                 requests_batch.append(requests_queue.get(timeout=CHECK_INTERVAL))
-#             except Empty:
-#                 continue
 
-#             for request in requests_batch:
-#                 request['output'] = run(request['input'][0])
+def handle_requests_by_batch():
+    while True:
+        requests_batch = []
+        while not (len(requests_batch) >= BATCH_SIZE):
+            try:
+                requests_batch.append(requests_queue.get(timeout=CHECK_INTERVAL))
+            except Empty:
+                continue
 
-# threading.Thread(target=handle_requests_by_batch).start()
+            for request in requests_batch:
+                request['output'] = run(request['input'][0])
+
+threading.Thread(target=handle_requests_by_batch).start()
 
 @app.route("/", methods=["GET"])
 def index():
@@ -44,44 +45,39 @@ def healthCheck():
 
 @app.route("/detect", methods=["POST"])
 def detect():
+    if requests_queue.qsize() > BATCH_SIZE: 
+        return jsonify({'msg': 'Too Many Requests'}), 429
+
+    # read Image RGB
     image = Image.open(request.files['image'].stream).convert('RGB')
 
-    # req = {
-    #     'input': [image]
-    # }
+    # for Queue
+    req = {
+        'input': [image]
+    }
+    requests_queue.put(req)
 
-    # requests_queue.put(req)
+    while 'output' not in req:
+        time.sleep(CHECK_INTERVAL)
 
-    # while 'output' not in req:
-    #     time.sleep(CHECK_INTERVAL)
-    
-    # result = req['output']
-    result = inference(model, image, target_shape=(360, 360))
+    result = req['output']
 
     if 'msg' in result:
         return jsonify(result['msg']), 500
 
-    # image = result[1]
-    # im_pil = Image.fromarray(image)
-    # iio = io.BytesIO()
-    # im_pil.save(iio, 'PNG')
-    # iio.seek(0)
-
-    image = get_response_image(result[1])
-    print(result[0])
+    # convert image stream to base64 URL
+    image = get_base64URL(result[1])
     return jsonify({'info':str(result[0]),'img':image}), 200
-    # return send_file(iio, mimetype='image/png')
     
 def run(image):
-    
     try:
-        result = inference(model, image, target_shape=(180, 180))
+        result = inference(model, image, target_shape=(360, 360))
     except:
         return {'msg': 'Dectection Error'}
 
     return result
 
-def get_response_image(image):
+def get_base64URL(image):
     im_pil = Image.fromarray(image)
     img_io = io.BytesIO()
     im_pil.save(img_io, 'PNG')
@@ -91,4 +87,4 @@ def get_response_image(image):
     return encoded_img
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=80)
