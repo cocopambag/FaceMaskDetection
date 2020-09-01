@@ -79,11 +79,26 @@
                 <hr class="solid">
                 <!-- If your project have a input files -->
                 <h2>Let's try detect!</h2>
+                
                 <div>
+                    <input type="radio" name="mode" id="image_mode" checked="checked" style="margin-right: 5px;"> 
+                    <label for="image_mode">Image</label>
+                    <input type="radio" name="mode" id="video_mode" style="margin-right: 5px; margin-left: 5px;"> 
+                    <label for="video_mode">Video</label>
+                </div>
+
+                <div id="input_video_box" style="display:none">
+                    <label for="label1">Input video: </label>
+                    <input type = 'file' id = 'input_video' style="margin-right: 10px; margin-bottom: 10px;">
+                    <button id = "btn_video" type='submit' class="btn btn-primary btn-lg" style="margin-left: auto;"> submit </button>
+                </div>
+
+                <div id="input_image_box" style="display:inline-block">
                     <label for="label1">Input image: </label>
                     <input type = 'file' id = 'input_image' style="margin-right: 10px; margin-bottom: 10px;">
-                    <button id = "submit" type='submit' class="btn btn-primary btn-lg" style="margin-left: auto;"> submit </button>
+                    <button id = "btn_image" type='submit' class="btn btn-primary btn-lg" style="margin-left: auto;"> submit </button>
                 </div>
+                
                 
                 <!-- Result Box -->
                 <div id ='resultBox' style="margin-left: auto; margin-right: auto;">
@@ -91,7 +106,11 @@
                         <div id = "statusWraaper"><p id='statusBox'></p></div>
                         <div id = "loader" style="display: none;"></div><br>
                     </div>
-                    <img id="result" src="">
+                    <img id="result_image" src="">
+                    <video id="result_video_box" style="display:none" controls>
+                        <source id="result_video" src="" type="video/mp4">
+                    </video>
+
                 </div>
 
                 <div id="badge" OnClick="location.href='https://join.slack.com/t/ainetwork-dev/shared_invite/zt-c89mb8z9-IqaCsNmsNLXKNylKXrJTTg'"
@@ -136,13 +155,13 @@
                 <!-- onclick function, you can delete this if you want  -->
                 <script>
                     window.location.origin = "localhost"
-                    document.getElementById("submit").onclick = () => {
+                    document.getElementById("btn_image").onclick = () => {
 
                         var loading = document.getElementById("statusBox");
                         loading.innerHTML = "Loading..."
                         waiting();
                         
-                        var result = document.getElementById("result");
+                        var result = document.getElementById("result_image");
                         
                         var formData = new FormData();
                         var input_image = document.getElementById("input_image").files[0]
@@ -162,7 +181,7 @@
                             }
                             else{
                                 response.json().then(response => {
-                                    loading.innerHTML = response['msg'];
+                                    loading.innerHTML = responsinline-e['msg'];
                                 })
                                 throw Error('error');
                             }
@@ -179,20 +198,97 @@
                         })
                     }
 
+                    document.getElementById("btn_video").onclick = () => {
+                        var loading = document.getElementById("statusBox");
+                        loading.innerHTML = "Loading..."
+                        waiting();
+                        
+                        var result = document.getElementById("result_video");
+                        var formData = new FormData();
+                        var input_video = document.getElementById("input_video").files[0]
+                        
+                        formData.append("video",input_video);
+
+                        fetch(
+                            '/detect-video',
+                            {
+                                method: 'POST',
+                                body: formData,
+                            }
+                        )
+                        .then(response => {
+                            if (response.status == 200){
+                                return response
+                            }
+                            else{
+                                response.json().then(response => {
+                                    loading.innerHTML = responsinline-e['msg'];
+                                })
+                                throw Error('error');
+                            }
+                        })
+                        .then(response => response.blob())
+                        .then(blob => URL.createObjectURL(blob))
+                        .then(URL => {
+                            result.src = URL;
+                            var videoBox = document.getElementById("result_video_box");
+                            videoBox.load()
+                            videoBox.play()
+                        })
+                        .catch(error => {
+                            stopWaiting();
+                        })
+                    }
+
                     function waiting(){
                         var spining = document.getElementById("loader");
                         spining.style.display = 'inline-block';
-                        var button = document.getElementById("submit"); 
-                        button.disabled = "disabled";
-
+                        var mode = $("input:radio[name='mode']:checked").val();
+                        if(mode == "image_mode"){
+                            var button = document.getElementById("btn_image"); 
+                            button.disabled = "disabled";
+                        }
+                        else{
+                            var button = document.getElementById("btn_video"); 
+                            button.disabled = "disabled";
+                        }
                     }
 
                     function stopWaiting(){
                         var spining = document.getElementById("loader");
                         spining.style.display = "none";
-                        var button = document.getElementById("submit"); 
-                        button.disabled = false;
+                        if(mode == "image_mode"){
+                            var button = document.getElementById("btn_image"); 
+                            button.disabled = false;
+                        }
+                        else{
+                            var button = document.getElementById("btn_video"); 
+                            button.disabled = false;
+                        }
                     }
+                    
+                    document.getElementById("image_mode").onclick = () => {
+                        var input_video_box = document.getElementById("input_video_box");
+                        input_video_box.style.display = "none";
+                        var input_image_box = document.getElementById("input_image_box");
+                        input_image_box.style.display = "inline-block";
+                        var image_result = document.getElementById("result_image");
+                        image_result.style.display = "block";
+                        var video_result = document.getElementById("result_video_box");
+                        video_result.style.display = "none";
+                    }
+
+                    document.getElementById("video_mode").onclick = () => {
+                        var input_video_box = document.getElementById("input_video_box");
+                        input_video_box.style.display = "inline-block";
+                        var input_image_box = document.getElementById("input_image_box");
+                        input_image_box.style.display = "none";
+                        var image_result = document.getElementById("result_image");
+                        image_result.style.display = "none";
+                        var video_result = document.getElementById("result_video_box");
+                        video_result.style.display = "block";
+                    }
+
                 </script>
             </div>
         </div>
