@@ -67,7 +67,10 @@
                 <br>
                 <A>Open API : </A> <A href="" target="blank"> on Ainize </A><br>
                 <br>
-                
+                <h4>Note</h4>
+                <ul>
+                    <li>If you use video, It work only on mp4 file</li>
+                </ul>
                 <hr class="solid">
 
                 <div id="sampleBox" style="margin-bottom:10px">
@@ -106,8 +109,8 @@
                         <div id = "statusWraaper"><p id='statusBox'></p></div>
                         <div id = "loader" style="display: none;"></div><br>
                     </div>
-                    <img id="result_image" src="">
-                    <video id="result_video_box" style="display:none" controls>
+                    <img id="result_image" style="width:400px" src="">
+                    <video id="result_video_box" style="display:none; width:400px" controls>
                         <source id="result_video" src="" type="video/mp4">
                     </video>
 
@@ -222,7 +225,7 @@
                             }
                             else{
                                 response.json().then(response => {
-                                    loading.innerHTML = responsinline-e['msg'];
+                                    loading.innerHTML = response['msg'];
                                 })
                                 throw Error('error');
                             }
@@ -234,6 +237,9 @@
                             var videoBox = document.getElementById("result_video_box");
                             videoBox.load()
                             videoBox.play()
+
+                            loading.innerHTML = "Done!"
+                            stopWaiting();
                         })
                         .catch(error => {
                             stopWaiting();
@@ -257,6 +263,7 @@
                     function stopWaiting(){
                         var spining = document.getElementById("loader");
                         spining.style.display = "none";
+                        var mode = $("input:radio[name='mode']:checked").val();
                         if(mode == "image_mode"){
                             var button = document.getElementById("btn_image"); 
                             button.disabled = false;
