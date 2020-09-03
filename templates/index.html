@@ -84,9 +84,9 @@
                 <h2>Let's try detect!</h2>
                 
                 <div>
-                    <input type="radio" name="mode" id="image_mode" checked="checked" style="margin-right: 5px;"> 
+                    <input type="radio" name="mode" id="image_mode" value="image_mode" checked="checked" style="margin-right: 5px;"> 
                     <label for="image_mode">Image</label>
-                    <input type="radio" name="mode" id="video_mode" style="margin-right: 5px; margin-left: 5px;"> 
+                    <input type="radio" name="mode" id="video_mode" value="video_mode" style="margin-right: 5px; margin-left: 5px;"> 
                     <label for="video_mode">Video</label>
                 </div>
 
@@ -101,13 +101,14 @@
                     <input type = 'file' id = 'input_image' style="margin-right: 10px; margin-bottom: 10px;">
                     <button id = "btn_image" type='submit' class="btn btn-primary btn-lg" style="margin-left: auto;"> submit </button>
                 </div>
+
+                <div id = "loader" style="display: none;"></div><br>
                 
                 
                 <!-- Result Box -->
                 <div id ='resultBox' style="margin-left: auto; margin-right: auto;">
                     <div id ="loadingWraaper">
                         <div id = "statusWraaper"><p id='statusBox'></p></div>
-                        <div id = "loader" style="display: none;"></div><br>
                     </div>
                     <img id="result_image" style="width:400px" src="">
                     <video id="result_video_box" style="display:none; width:400px" controls>
@@ -258,6 +259,9 @@
                             var button = document.getElementById("btn_video"); 
                             button.disabled = "disabled";
                         }
+
+                        var resultBox = document.getElementById("resultBox");
+                        resultBox.style.display = "none";
                     }
 
                     function stopWaiting(){
@@ -272,6 +276,9 @@
                             var button = document.getElementById("btn_video"); 
                             button.disabled = false;
                         }
+
+                        var resultBox = document.getElementById("resultBox");
+                        resultBox.style.display = "block";
                     }
                     
                     document.getElementById("image_mode").onclick = () => {
