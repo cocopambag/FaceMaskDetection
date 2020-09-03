@@ -24,10 +24,10 @@ anchors_exp = np.expand_dims(anchors, axis=0)
 
 id2class = {0: 'Mask', 1: 'NoMask'}
 
-def inference(model, image, target_shape, conf_thresh=0.5, iou_thresh=0.4 ):
+def inference(model, image, target_shape, conf_thresh=0.5, iou_thresh=0.4, mode=1 ):
 
-    # convert RGB to BGR
     image = np.array(image)[:, :, ::-1].copy()
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     output_info = []
     height, width, _ = image.shape
@@ -66,14 +66,18 @@ def inference(model, image, target_shape, conf_thresh=0.5, iou_thresh=0.4 ):
         if class_id == 0:
             color = (0, 255, 0)
         else:
-            color = (0, 0, 255)
+            if mode:
+                color = (0, 0, 255)
+            else:
+                color = (255, 0, 0)
+                
         cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
         cv2.putText(image, "%s: %.2f" % (id2class[class_id], conf), (xmin + 2, ymin - 2),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, color)
 
         output_info.append([class_id, conf, xmin, ymin, xmax, ymax])
 
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    
     return (output_info, image)
 
 def run_on_video(model, video_path, output_video_name, conf_thresh):

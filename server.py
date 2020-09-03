@@ -5,6 +5,7 @@ import base64
 import uuid
 import os
 from PIL import Image
+import numpy as np 
 
 import threading
 import time
@@ -48,11 +49,13 @@ def healthCheck():
 
 @app.route("/detect-image", methods=["POST"])
 def detect_image():
+    print(requests_queue.qsize())
     if requests_queue.qsize() > BATCH_SIZE: 
         return jsonify({'msg': 'Too Many Requests'}), 429
 
-    # read Image RGB
+    # read Image
     image = Image.open(request.files['image'].stream).convert('RGB')
+
 
     # for Queue
     req = {
@@ -114,7 +117,7 @@ def run(input_file, mode):
 
 def run_image(image):
     try:
-        result = inference(model, image, target_shape=(360, 360))
+        result = inference(model, image, target_shape=(360, 360),mode=0)
     except:
         return {'msg': 'Dectection Error'}
 
