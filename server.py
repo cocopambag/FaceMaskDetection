@@ -53,9 +53,12 @@ def detect_image():
     if requests_queue.qsize() > BATCH_SIZE: 
         return jsonify({'msg': 'Too Many Requests'}), 429
 
-    # read Image
-    image = Image.open(request.files['image'].stream).convert('RGB')
-
+    try:
+        # read Image
+        image = Image.open(request.files['image'].stream).convert('RGB')
+    except Exception as e:
+        print(e)
+        return jsonify({'msg':'Invalid file'}), 400
 
     # for Queue
     req = {
