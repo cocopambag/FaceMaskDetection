@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+   title: FaceMaskDetection
+   description: |
+    Detect faces and determine whether they are wearing mask.
+    There are several frameworks in the original project, but this API works only with a pytorch.
+    
+    [Original Repo](https://github.com/AIZOOTech/FaceMaskDetection)
+    [Github Repo](https://github.com/woomurf/FaceMaskDetection)
+    [Demo](https://github.com/woomurf/FaceMaskDetection)
+   version: "0.1"
+   license:
+      name: MIT License
+      
+servers:
+   - url: https://master-face-mask-detection-woomurf.endpoint.ainize.ai/
+
+paths:
+    /detect-image:
+      post:
+        requestBody:
+          required: true
+          description: | 
+            Detect from image.
+            
+            Response object is 
+            {
+              "image" : "base64URL",
+              "info" : [isMask, percentage, xmin, ymin, xmax, ymax]
+            }
+            
+            Try using [sample Image](https://raw.githubusercontent.com/woomurf/FaceMaskDetection/master/static/mask_people1.jpg).
+          content:
+               multipart/form-data:
+                  schema:
+                     type: object
+                     properties:
+                        image:
+                           type: string
+                           format: binary
+                     required:
+                        - image 
+        responses:
+            '200':
+               description: success
+               content:
+                  application/json:
+                     schema:
+                        type: object
+            '400':
+               description: Bad request
+            '429':
+               description: busy to server, please retry again.
+            '500':
+               description: Server Side Error
+    /detect-video:
+      post:
+        requestBody:
+          required: true
+          description: | 
+            Detect from video. Response is video stream.
+            
+            Try using [sample video](https://media3.giphy.com/media/Qae5teAq9l2FACtFVO/giphy.mp4)
+            
+            But, open api not supports response of video stream. so I recommand try to this in [Demo](https://master-face-mask-detection-woomurf.endpoint.ainize.ai/).
+          content:
+               multipart/form-data:
+                  schema:
+                     type: object
+                     properties:
+                        video:
+                           type: string
+                           format: binary
+                     required:
+                        - video
+        responses:
+            '200':
+               description: success
+               content:
+                  multipart/form-data:
+                     schema:
+                        type: string
+                        format: binary
+            '400':
+               description: Bad request
+            '429':
+               description: busy to server, please retry again.
+            '500':
+               description: Server Side Error
