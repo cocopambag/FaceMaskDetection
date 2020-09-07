@@ -6,6 +6,7 @@ import uuid
 import os
 from PIL import Image
 import numpy as np 
+import shutil
 
 import threading
 import time
@@ -14,15 +15,18 @@ from maskDetection import inference, run_on_video
 from load_model.pytorch_loader import load_pytorch_model
 from utils.meta import toH264
 
+DATA_PATH = './data/'
+
 app = Flask(__name__, template_folder="./templates/")
+app.config["MAX_CONTENT_LENGTH"] = 15 * 1024 * 1024 # 15MB
 
 requests_queue = Queue()
 BATCH_SIZE = 1
 CHECK_INTERVAL = 0.1
 
-b = time.time()
+startTime = time.time()
 model = load_pytorch_model('models/model360.pth') 
-print("model load time : ", time.time()-b)
+print("model load time : ", time.time()-startTime)
 
 def handle_requests_by_batch():
     while True:
@@ -45,7 +49,6 @@ def index():
 @app.route("/healthz", methods=["GET"])
 def healthCheck():
     return "ok", 200
-
 
 @app.route("/detect-image", methods=["POST"])
 def detect_image():
@@ -83,17 +86,21 @@ def detect_video():
     if requests_queue.qsize() > BATCH_SIZE: 
         return jsonify({'msg': 'Too Many Requests'}), 429
 
+    video_id = str(uuid.uuid4())
+    file_path = os.path.join(DATA_PATH, video_id)
+    os.makedirs(file_path, exist_ok=True)
+
     try:
         video = request.files['video']
-        video_id = str(uuid.uuid4())
-
-        video.save(video_id)
+        video_path = os.path.join(file_path, "original.mp4")
+        video.save(video_path)
     except Exception as e:
         print(e)
         return jsonify({'msg': 'Invalid file'}), 400
     
+    # for Queue
     req = {
-        'input':[video_id, "video"]
+        'input':[file_path, "video"]
     }
     requests_queue.put(req)
 
@@ -102,12 +109,12 @@ def detect_video():
 
     result = req['output']
 
-    final = open(result,'rb')
-
-    video_remove(result)
-
     if 'msg' in result:
         return jsonify(result['msg']), 500
+
+    final = open(result,'rb')
+
+    shutil.rmtree(file_path)
 
     return send_file(final, mimetype="video/mp4")
     
@@ -126,26 +133,36 @@ def run_image(image):
 
     return result
 
-def run_video(video_id):
-    
-    video_output = video_id + '_result.mp4'
+def run_video(file_path):
+
+    original_video_path = os.path.join(file_path, "original.mp4")
+    resize_video_path = os.path.join(file_path, "resize.mp4")
+    result_video_path = os.path.join(file_path, "result.mp4")
+
     try:
-        result = run_on_video(model, video_id, video_output, conf_thresh=0.5)
+        # convert video to 15fps 
+        width_resize = 480
+        os.system(
+            "ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -t 10 -filter:v scale={}:-2 -r 15 -c:a copy '{}'".format(
+                os.path.abspath(original_video_path), width_resize, os.path.abspath(resize_video_path)))
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'Resizing fail'}), 500
+    
+    try:
+        result = run_on_video(model, resize_video_path, result_video_path, conf_thresh=0.5)
 
         if result['msg'] != 'Success':
-            video_remove(video_id)
+            shutil.rmtree(file_path)
             return jsonify({'msg' : result['msg']}), 500
 
-        moditied_video = toH264(video_output)
-        video_remove(str(video_id))
-        video_remove(video_output)
+        moditied_video = toH264(result_video_path)
 
     except Exception as e:
         print(e)
         return jsonify({'msg': 'Dectection Error'})
     
     return moditied_video
-
 
 def get_base64URL(image):
     im_pil = Image.fromarray(image)
@@ -156,11 +173,8 @@ def get_base64URL(image):
     encoded_img = 'data:image/png;base64,' + encoded_img
     return encoded_img
 
-def video_remove(video_id):
-    if os.path.exists(video_id):
-        os.remove(video_id)
-        return True
-    return False
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80) 
+    from waitress import serve
+    serve(app, host='0.0.0.0', port=80)
+    # app.run(host='0.0.0.0', port=80) 
