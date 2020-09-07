@@ -69,7 +69,8 @@
                 <br>
                 <h4>Note</h4>
                 <ul>
-                    <li>If you use video, It work only on mp4 file</li>
+                    <li>If you use video, It work only with mp4 file</li>
+                    <li>The file size is limited of 15MB</li>
                 </ul>
                 <hr class="solid">
 
@@ -185,7 +186,7 @@
                             }
                             else{
                                 response.json().then(response => {
-                                    loading.innerHTML = responsinline-e['msg'];
+                                    loading.innerHTML = response['msg'];
                                 })
                                 throw Error('error');
                             }
