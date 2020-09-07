@@ -3,7 +3,7 @@ info:
    title: FaceMaskDetection
    description: |
     Detect faces and determine whether they are wearing mask.
-    There are several frameworks in the original project, but this API works only with a pytorch.
+    There are several frameworks(PyTorch, TensorFlow, Keras, MXNet, Caffe) in the original project, but this API works only with a PyTorch.
     
     [Original Repo](https://github.com/AIZOOTech/FaceMaskDetection)
     [Github Repo](https://github.com/woomurf/FaceMaskDetection)
