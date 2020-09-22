@@ -58,7 +58,10 @@ def detect_image():
 
     try:
         # read Image
-        image = Image.open(request.files['image'].stream).convert('RGB')
+        file_image = request.files['image']
+        if "image" not in file_image.content_type:
+            raise Exception("Invalid file")
+        image = Image.open(file_image.stream).convert('RGB')
     except Exception as e:
         print(e)
         return jsonify({'msg':'Invalid file'}), 400
@@ -92,6 +95,8 @@ def detect_video():
 
     try:
         video = request.files['video']
+        if video.content_type != "video/mp4":
+            raise Exception("invalid file")
         video_path = os.path.join(file_path, "original.mp4")
         video.save(video_path)
     except Exception as e:

@@ -5,7 +5,7 @@ Demo & Open API
 ---
 
 # FaceMaskDetection
-[中文版](README-zh.md) | English version
+[中文版](https://github.com/AIZOOTech/FaceMaskDetection/blob/master/README-zh.md) | English version
 
 ### We open source all the popular deep learning frameworks' model and inference code to do face mask detection.
 
@@ -25,11 +25,11 @@ Demo & Open API
 
 * We make face mask detection models with five mainstream deep learning frameworks （PyTorch、TensorFlow、Keras、MXNet和caffe） open sourced, and the corresponding inference codes. 
 
-* We published 7959 images to train the models. The dataset is composed of [WIDER Face](http://shuoyang1213.me/WIDERFACE/) and [MAFA](http://www.escience.cn/people/geshiming/mafa.html), we verified some wrong annotations.  You can download here from [Google drive](https://drive.google.com/file/d/1QspxOJMDf_rAWVV7AU_Nc0rjo1_EPEDW/view?usp=sharing), if you can not visit Google, you can download it from BaiduDisk, click [here to know how to download](README-zh.md).
+* We published 7959 images to train the models. The dataset is composed of [WIDER Face](http://shuoyang1213.me/WIDERFACE/) and [MAFA](http://www.escience.cn/people/geshiming/mafa.html), we verified some wrong annotations.  You can download here from [Google drive](https://drive.google.com/file/d/1QspxOJMDf_rAWVV7AU_Nc0rjo1_EPEDW/view?usp=sharing), if you can not visit Google, you can download it from BaiduDisk, click [here to know how to download](https://github.com/AIZOOTech/FaceMaskDetection/blob/master/README-zh.md).
 
 
 
-![](img/demo.png)
+![](https://raw.githubusercontent.com/AIZOOTech/FaceMaskDetection/master/img/demo.png)
 
 
 We deployed a web page, you can click the link to experience it.
@@ -75,23 +75,23 @@ python tensorflow_infer.py  --img-path /path/to/your/img
 ### Feedback
 If you use wechat, you can follow us.
 
-![](img/wx.png)
+![](https://raw.githubusercontent.com/AIZOOTech/FaceMaskDetection/master/img/wx.png)
 
 ** If you use Wechat, scan the code to add  me on wechat **
 
-![](img/author.jpg)
+![](https://raw.githubusercontent.com/AIZOOTech/FaceMaskDetection/master/img/author.jpg)
 
 
 ### Model structure
 
 We merge the BN to Conv layers in order to accelerate the inference speed.
 
-![](img/face_mask_detection.caffemodel.png)
+<img src="https://raw.githubusercontent.com/AIZOOTech/FaceMaskDetection/master/img/face_mask_detection.caffemodel.png" style="width:100%">
 
 ### Testset PR curve
 
 
-![](img/pr_curve.png)
+![](https://raw.githubusercontent.com/AIZOOTech/FaceMaskDetection/master/img/pr_curve.png)
 
 
 
@@ -100,4 +100,4 @@ We merge the BN to Conv layers in order to accelerate the inference speed.
 
 [aizoo.com face mask detection demo](https://demo.aizoo.com/face-mask-detection.html)
 
-![](img/facemask.gif)
+![](https://raw.githubusercontent.com/AIZOOTech/FaceMaskDetection/master/img/facemask.gif)
