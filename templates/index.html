@@ -65,7 +65,7 @@
                 <!-- Github link and Ainize link -->
                 <A>GitHub Repo : </A> <A href="https://github.com/woomurf/FaceMaskDetection" target="blank">https://github.com/woomurf/FaceMaskDetection</A>
                 <br>
-                <A>Open API : </A> <A href="" target="blank"> on Ainize </A><br>
+                <A>Open API : </A> <A href="https://ainize.ai/woomurf/FaceMaskDetection?branch=master" target="blank"> on Ainize </A><br>
                 <br>
                 <h4>Note</h4>
                 <ul>
@@ -83,9 +83,9 @@
                     <img class="sample" src="../static/sample3.png">
                 </div>
                 <hr class="solid">
-                <!-- If your project have a input files -->
-                <h2>Let's put our face mask detector to work!</h2>
                 
+                <h2>Let's put our face mask detector to work!</h2>
+
                 <div>
                     <input type="radio" name="mode" id="image_mode" value="image_mode" checked="checked" style="margin-right: 5px;"> 
                     <label for="image_mode">Image</label>
@@ -93,8 +93,8 @@
                     <label for="video_mode">Video</label>
                 </div>
 
-                <a href="https://raw.githubusercontent.com/woomurf/FaceMaskDetection/master/static/mask_people1.jpg">sample image</a> | 
-                <a href="https://media3.giphy.com/media/Qae5teAq9l2FACtFVO/giphy.mp4">sample video</a> <br>
+                <a href="../static/mask_people1.jpg" target="blank">sample image</a> |
+                <a href="../static/sample_video.mp4" target="blank">sample video</a> <br>
 
                 <div id="input_video_box" style="display:none">
                     <label for="label1">Input video: </label>
@@ -107,11 +107,8 @@
                     <input type = 'file' id = 'input_image' style="margin-right: 10px; margin-bottom: 10px;">
                     <button id = "btn_image" type='submit' class="btn btn-primary btn-lg" style="margin-left: auto;"> submit </button>
                 </div>
-
                 
-
                 <div id = "loader" style="display: none;"></div><br>
-                
                 
                 <!-- Result Box -->
                 <div id ='resultBox' style="margin-left: auto; margin-right: auto; display:none;">
